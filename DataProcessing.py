@@ -3,22 +3,20 @@ import os
 import numpy
 import matplotlib
 import pylab
-print('Hello world!')
 
-def readFile():
-    readData = []
-    f = open(r"C:\Users\孙晓培\AnacondaProjects\DataProcessing\180322.002.txt");
-    for i in f.readlines():
-        if i[:5] == "Added":
-            readData.append(i)
-    f.close()
-    return readData
- 
-def writeFile():
-    data = readFile()
-    f = open(r"new file path","w")
-    f.writelines(data)
-    f.close()
- 
-if __name__ == '__main__':
-    writeFile()
+
+def ReadData(name,path):
+    
+    file = open(path)
+    All=file.readlines()
+    for i in All:
+        if i[16:20] == "Time":
+            position=All.index(i)+1
+            print('Your data begins from Row %d, The meanings of each column are: \n %s' %(position,i))
+    data=numpy.loadtxt(name,skiprows=position)
+    #print(data[0][0])
+    file.close()
+    return data
+
+data=ReadData('180322.002.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180322.002.txt')
+print(data[0][0])
