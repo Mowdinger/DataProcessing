@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import os
-Height=input('')
+Height=input('Height:')
 #Height='175'
 Height=int(Height)
-print(Height)
+print('My Height is %d cm' % Height)
