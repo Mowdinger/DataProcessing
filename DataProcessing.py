@@ -3,7 +3,7 @@ import numpy as np
 import scipy as sp
 import matplotlib
 import matplotlib.pyplot as plt
-import pylab as plb
+from pylab import *
 
 
 def ReadData(name,path):
@@ -19,18 +19,97 @@ def ReadData(name,path):
     file.close()
     return data
 
-# data1=ReadData('180322.001.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180322.001.txt')
-# #print(data[:,2])
-# plt.figure(1)
+# #随磁场变化四个器件微分电阻值的对比：
+data1=ReadData('180322.001.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180322.001.txt')
+for i in np.linspace(0,data1.shape[0]-1,data1.shape[0]):
+    if data1[int(i)][4]==data1[0][4]:
+        continue
+    else:
+        y_points=int(i)
+        x_points=int(data1.shape[0]/i)
+        print('There are %d points in \'I_bias\' and %d points in Magnetic Filed \'B\'.' %(y_points,x_points))
+        break
+
+for i in np.linspace(0,data1.shape[0]-1,data1.shape[0]):
+    if data1[int(i)][4]==0:
+        zero_mgnet=int(i)
+        print('The point %d means zero magnet' %int(i))
+        break
+
+plt.figure(1)#绘制四个器件微分电阻随磁场的变化
+
+plt.subplot(4,1,1)
+x=data1[0:-1:501,4]
+y=data1[251:-1:501,1]/1e-7
+plt.plot(x,y)
+xlabel(r'$B(T)$')
+ylabel(r'$dv/dI(\Omega)$')
+
+plt.subplot(4,1,2)
+x=data1[0:-1:501,4]
+y=data1[251:-1:501,2]/1e-7
+plt.plot(x,y)
+xlabel(r'$B(T)$')
+ylabel(r'$dv/dI(\Omega)$')
+
+plt.subplot(4,1,3)
+x=data1[0:-1:501,4]
+y=data1[251:-1:501,5]/1e-9
+plt.plot(x,y)
+xlabel(r'$B(T)$')
+ylabel(r'$dv/dI(\Omega)$')
+
+plt.subplot(4,1,4)
+x=data1[0:-1:501,4]
+y=data1[251:-1:501,6]/1e-7
+plt.plot(x,y)
+xlabel(r'$B(T)$')
+ylabel(r'$dv/dI(\Omega)$')
+
+plt.subplots_adjust(wspace =0, hspace =0.3)#调整子图间距
+
+plt.figure(2)#绘制四个器件微分电阻随偏置电流的变化
+
+plt.subplot(4,1,1)
+x=data1[zero_mgnet:zero_mgnet+y_points,3]
+y=data1[zero_mgnet:zero_mgnet+y_points,1]/1e-7
+plt.plot(x,y)
+xlabel(r'$I_{Bias}(\mu A)$')
+ylabel(r'$dv/dI(\Omega)$')
+
+plt.subplot(4,1,2)
+x=data1[zero_mgnet:zero_mgnet+y_points,3]
+y=data1[zero_mgnet:zero_mgnet+y_points,2]/1e-7
+plt.plot(x,y)
+xlabel(r'$I_{Bias}(\mu A)$')
+ylabel(r'$dv/dI(\Omega)$')
+
+plt.subplot(4,1,3)
+x=data1[zero_mgnet:zero_mgnet+y_points,3]
+y=data1[zero_mgnet:zero_mgnet+y_points,5]/1e-9
+plt.plot(x,y)
+xlabel(r'$I_{Bias}(\mu A)$')
+ylabel(r'$dv/dI(\Omega)$')
+
+plt.subplot(4,1,4)
+x=data1[zero_mgnet:zero_mgnet+y_points,3]
+y=data1[zero_mgnet:zero_mgnet+y_points,6]/1e-7
+plt.plot(x,y)
+xlabel(r'$I_{Bias}(\mu A)$')
+ylabel(r'$dv/dI(\Omega)$')
+
+plt.subplots_adjust(wspace =0, hspace =0.3)#调整子图间距
+
 # for i in np.linspace(2,data1.shape[1],data1.shape[1]-1):
-#     plt.subplot(data1.shape[1],1,i-1)
+#     plt.subplot(data1.shape[1]-1,1,i-1)
 #     x=data1[:,0]
 #     y=data1[:,int(i)-1]
 #     plt.plot(x,y)
 #     #plt.title('Column %d' %i)
-# plt.show()
 
-data2=ReadData('180323.004.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180323.004.txt')
+
+#细扫二维图：
+data2=ReadData('180322.001.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180322.001.txt')
 
 for i in np.linspace(0,data2.shape[0]-1,data2.shape[0]):
     if data2[int(i)][-1]==data2[0][-1]:
@@ -38,16 +117,23 @@ for i in np.linspace(0,data2.shape[0]-1,data2.shape[0]):
     else:
         y_points=int(i)
         x_points=int(data2.shape[0]/i)
-        print('There are %d points in Magnetic Filed \'B\' and %d points in \'I_bias\'.' %(y_points,x_points))
+        print('There are %d points in \'I_bias\' and %d points in Magnetic Filed \'B\'.' %(y_points,x_points))
         break
 
-plt.figure(2)
+for i in np.linspace(0,data2.shape[0]-1,data2.shape[0]):
+    if data2[int(i)][4]==0:
+        print('The point %d means zero magnet' %int(i))
+        break
 
-x=np.linspace(data2[0][-1],data2[-1][-1],x_points)
-y=np.linspace(data2[0][3],data2[-1][3],y_points)
-X,Y=np.meshgrid(x,y)
-R=data2[:,1].reshape(x_points,y_points)
 
-plb.pcolor(X,Y,R.T)
-plb.colorbar()
+# plt.figure(2)
+
+# x=np.linspace(data2[0][-1],data2[-1][-1],x_points)
+# y=np.linspace(data2[0][3],data2[-1][3],y_points)
+# X,Y=np.meshgrid(x,y)
+# R=data2[:,1].reshape(x_points,y_points)
+
+# pcolor(X,Y,R.T)
+# colorbar()
+
 plt.show()
