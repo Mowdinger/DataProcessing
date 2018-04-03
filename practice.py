@@ -22,6 +22,8 @@ ylim(Y.min()*1.1,Y.max()*1.1) # Set y limits
 yticks([-1, 0, +1],
        [r'$-1$', r'$0$', r'$+1$']) # Set y ticks
 
+text(-4,1,'(a)',fontsize=12)
+
 ax = gca()
 ax.spines['right'].set_color('none')
 ax.spines['top'].set_color('none')

@@ -6,10 +6,10 @@ Sample:
 
 R_Va=1M Omega
 
-I_AC1=10e-7 A;
-I_AC2=10e-7 A;
-I_AC3=10e-9 A;
-I_AC4=10e-7 A;
+I_AC1=1e-7 A;
+I_AC2=1e-7 A;
+I_AC3=1e-9 A;
+I_AC4=1e-7 A;
 
 
 
