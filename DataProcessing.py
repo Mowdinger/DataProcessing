@@ -19,7 +19,7 @@ def ReadData(name,path):
     file.close()
     return data
 
-#定义将微分电阻转化为微分电导的函数,注意偏置电流的数列最中间点必须是零点,偏置电流值需要为uA
+#定义将微分电阻转化为微分电导的函数,注意偏置电流的数列最中间点必须是零点,偏置电流值需要为uA,V(I)需要为单调递增函数
 def dr2dc(I_bias,dr):
 
     if dr.size!=I_bias.size:
@@ -37,12 +37,27 @@ def dr2dc(I_bias,dr):
         V[i]=V[i-1]+dr[i-1]*(I_bias[i]-I_bias[i-1])
     V=V-V[I0]
 
+    dc=np.divide(1,dr)
+    dc=6.62607004e-34*dc/(2* 1.6021766**2 * 1e-38) #转化单位从\Omega^{-1}为2e^2/h
+
     plt.figure(3,figsize=(10,6))
-    plt.plot(I_bias,V)
-    xlabel(r'$I_{Bias}(\mu A)$',fontsize=12)
-    ylabel(r'$V(\mu V)$',fontsize=12,labelpad=12)
-    title('V-I Relationship',fontsize=16)
+    plt.plot(V,dc)
+    xlabel(r'$V(\mu V)$',fontsize=12)
+    ylabel(r'$dI/dV (2e^2/h)$',fontsize=12,labelpad=12)
+    title('Differential Conduction-Voltage Relationship',fontsize=16)
     return None
+    #线性插值:
+    # V1=np.linspace(V.min(),V.max(),size)
+    # I1=np.zeros(size)
+    # for i in np.linspace(0,size-1,size):
+    #     for j in np.linspace(0,size-1,size):
+    #         if (V1[i] >= V[j] and V1[i] < V[j+1]):
+    #             I1[i]=I[j]+(V1[i]-V[j])*(I[j+1]-I[j])/(V[j+1]-V[j])
+    #             break
+    #         else:
+    #             continue
+    
+
 
 # #随磁场变化四个器件微分电阻值的对比：
 data1=ReadData('180322.001.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180322.001.txt')
@@ -156,10 +171,10 @@ plt.subplots_adjust(wspace =0, hspace =0.3)#调整子图间距
 
 fig2.savefig('Resistance-BiasCurrent.jpg')
 
-#二维图：
-# data2=ReadData('180322.001.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180322.001.txt')
+# #二维图：
+# data2=ReadData('180323.004.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180323.004.txt')
 
-#判断扫场的方式以及寻找断点
+# #判断扫场的方式以及寻找断点
 # for i in np.linspace(0,data2.shape[0]-1,data2.shape[0]):
 #     if data2[int(i)][-1]==data2[0][-1]:
 #         continue
@@ -174,7 +189,7 @@ fig2.savefig('Resistance-BiasCurrent.jpg')
 #         print('The point %d means zero magnet' %int(i))
 #         break
 
-# plt.figure()
+# plt.figure(5)
 
 # x=np.linspace(data2[0][-1],data2[-1][-1],x_points)
 # y=np.linspace(data2[0][3],data2[-1][3],y_points)
