@@ -3,6 +3,7 @@ import numpy as np
 import scipy as sp
 import matplotlib
 import matplotlib.pyplot as plt
+from scipy import interpolate
 from pylab import *
 
 #定义从.txt文档中读取实验数据的函数
@@ -19,9 +20,10 @@ def ReadData(name,path):
     file.close()
     return data
 
-#定义将微分电阻转化为微分电导的函数,注意偏置电流的数列最中间点必须是零点,偏置电流值需要为uA,V(I)需要为单调递增函数
+#定义将微分电阻与偏流的关系转化为微分电导与偏压的关系的函数,注意偏置电流的数列最中间点必须是零点,偏置电流值需要为uA,V(I)需要为单调递增函数
 def dr2dc(I_bias,dr):
 
+    #
     if dr.size!=I_bias.size:
         print('Error! The array of differential groups and bias currents must have the same dimensions!')
         return None
@@ -30,6 +32,7 @@ def dr2dc(I_bias,dr):
 
     I0=int(size/2)#寻找偏置电流零点(实际位置为I0+1)
     
+    #积分得到电压：
     V=np.zeros(size)#定义电压数组
     V[0]=0
     for i in np.linspace(1,size-1,size-1):
@@ -37,25 +40,23 @@ def dr2dc(I_bias,dr):
         V[i]=V[i-1]+dr[i-1]*(I_bias[i]-I_bias[i-1])
     V=V-V[I0]
 
+    #求微分电导
     dc=np.divide(1,dr)
     dc=6.62607004e-34*dc/(2* 1.6021766**2 * 1e-38) #转化单位从\Omega^{-1}为2e^2/h
 
-    plt.figure(3,figsize=(10,6))
-    plt.plot(V,dc)
-    xlabel(r'$V(\mu V)$',fontsize=12)
-    ylabel(r'$dI/dV (2e^2/h)$',fontsize=12,labelpad=12)
-    title('Differential Conduction-Voltage Relationship',fontsize=16)
-    return None
-    #线性插值:
-    # V1=np.linspace(V.min(),V.max(),size)
-    # I1=np.zeros(size)
-    # for i in np.linspace(0,size-1,size):
-    #     for j in np.linspace(0,size-1,size):
-    #         if (V1[i] >= V[j] and V1[i] < V[j+1]):
-    #             I1[i]=I[j]+(V1[i]-V[j])*(I[j+1]-I[j])/(V[j+1]-V[j])
-    #             break
-    #         else:
-    #             continue
+    #插值求并使数据点均匀
+    f=interpolate.interp1d(V,dc,kind='linear')
+    V_new=np.linspace(V.min(),V.max(),size)
+    dc_new=f(V_new)
+
+    ##绘图
+    # plt.figure(999,figsize=(10,6))
+    # plt.plot(V_new,dc_new)
+    # xlabel(r'$V(\mu V)$',fontsize=12)
+    # ylabel(r'$dI/dV (2e^2/h)$',fontsize=12,labelpad=12)
+    # title('Differential Conduction-Bias Voltage Relationship',fontsize=16)
+
+    return V_new,dc_new
     
 
 
@@ -85,17 +86,15 @@ for i in np.linspace(0,data1.shape[0]-1,data1.shape[0]):
 #     y=data1[:,int(i)-1]
 #     plt.plot(x,y)
 #     #plt.title('Column %d' %i)
-x=data1[zero_mgnet:zero_mgnet+y_points,3]/1e-6
-y=data1[zero_mgnet:zero_mgnet+y_points,1]/1e-7
 
-dr2dc(x,y)
-
-fig1=plt.figure(1,figsize=(10,6), dpi=600)#绘制四个器件微分电阻随磁场的变化
+#绘制四个器件微分电阻随磁场的变化：
+fig1=plt.figure(1,figsize=(10,6), dpi=600)
 labelsize=12
 
 plt.subplot(4,1,1)
 x=data1[0:-1:501,4]
 y=data1[251:-1:501,1]/1e-7
+y=6.62607004e-34*np.divide(1,y)/(2* 1.6021766**2 * 1e-38)#转化为微分电导并转化单位
 plt.plot(x,y,'b')
 xlabel(r'$B(T)$',fontsize=labelsize)
 ylabel(r'$dV/dI(\Omega)$',fontsize=labelsize,labelpad=12)
@@ -105,6 +104,7 @@ title('Differential Resistance with Parallel Magnetic Field',fontsize=16)
 plt.subplot(4,1,2)
 x=data1[0:-1:501,4]
 y=data1[251:-1:501,2]/1e-7
+y=6.62607004e-34*np.divide(1,y)/(2* 1.6021766**2 * 1e-38)#转化为微分电导并转化单位
 plt.plot(x,y,'r')
 xlabel(r'$B(T)$',fontsize=labelsize)
 ylabel(r'$dV/dI(\Omega)$',fontsize=labelsize,labelpad=20)
@@ -113,6 +113,7 @@ text(x.min()*1.08,y.max()-(y.max()-y.min())*0.15,'(b)')
 plt.subplot(4,1,3)
 x=data1[0:-1:501,4]
 y=data1[251:-1:501,5]/1e-9
+y=6.62607004e-34*np.divide(1,y)/(2* 1.6021766**2 * 1e-38)#转化为微分电导并转化单位
 plt.plot(x,y,'g')
 xlabel(r'$B(T)$',fontsize=labelsize)
 ylabel(r'$dV/dI(\Omega)$',fontsize=labelsize,labelpad=5)
@@ -121,6 +122,7 @@ text(x.min()*1.08,y.max()-(y.max()-y.min())*0.15,'(c)')
 plt.subplot(4,1,4)
 x=data1[0:-1:501,4]
 y=data1[251:-1:501,6]/1e-7
+y=6.62607004e-34*np.divide(1,y)/(2* 1.6021766**2 * 1e-38)#转化为微分电导并转化单位
 plt.plot(x,y,'c')
 xlabel(r'$B(T)$',fontsize=labelsize)
 ylabel(r'$dV/dI(\Omega)$',fontsize=labelsize,labelpad=16)
