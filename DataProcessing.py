@@ -140,7 +140,7 @@ fig1.savefig('Differential Conductance-Parallel Magnetic Field.jpg')
 fig2=plt.figure(2,figsize=(10,6), dpi=600)
 
 plt.subplot(4,1,1)
-x=data1[zero_mgnet:zero_mgnet+y_points,3]/1e6 #提取偏置电压数据并将其转化为偏置电流值(unit: A)
+x=data1[zero_mgnet:zero_mgnet+y_points,3]/1e6 #提取直流电压数据并将其转化为偏置电流值(unit: A)
 y=data1[zero_mgnet:zero_mgnet+y_points,1]/1e-7 #提取锁相放大器测量的数据并将其转化为微分电阻值（unit: \Omega）
 x,y=dr2dc(x,y)#将微分电阻与偏流换位微分电导与偏压(unit: \Omega^{-1} & V)
 x=x*1e6#将偏置电压单位转化为 \mu V

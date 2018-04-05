@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import scipy as sp
 import matplotlib
 import matplotlib.pyplot as plt
 from scipy import interpolate
@@ -57,7 +56,7 @@ def dr2dc(I_bias,dr):
     # title('Differential Conduction-Bias Voltage Relationship',fontsize=16)
 
     return V_new,dc_new
-    
+   
 #二维图：
 data2=ReadData('180323.004.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180323.004.txt')
 
@@ -76,7 +75,7 @@ for i in np.linspace(0,data2.shape[0]-1,data2.shape[0]):
         print('The point %d means zero magnet' %int(i))
         break
 
-fig3=plt.figure(3,figsize=(10,8))
+fig3=plt.figure(3,figsize=(10,8),dpi=600)
 
 # x=np.linspace(data2[0][-1],data2[-1][-1],x_points)
 # y=np.linspace(data2[0][3],data2[-1][3],y_points)
@@ -85,15 +84,15 @@ fig3=plt.figure(3,figsize=(10,8))
 # X,Y=np.meshgrid(x,y)
 
 x=np.linspace(data2[0][-1],data2[-1][-1],x_points)    #提取平行的磁场数据(unit:T)
-Ib=np.linspace(data2[0][2],data2[-1][2],y_points)/1e5 #提取锁相测量的数据并将其转化为偏置电流值(unit: A)
+Ib=np.linspace(data2[0][2],data2[-1][2],y_points)/1e5 #提取直流电压数据并将其转化为偏置电流值(unit: A)
 R=data2[:,1].reshape(x_points,y_points)
-R=R.T/1e-6
+R=R.T/1e-7 #提取锁相放大器测量的数据并将其转化为微分电阻值（unit: \Omega）
 
 G=np.zeros((y_points,x_points))
 for i in np.linspace(0,x_points-1,x_points):
     i=int(i)
     y,G[:,i]=dr2dc(Ib,R[:,i])#将微分电阻与偏流换位微分电导与偏压(unit: \Omega^{-1} & V)
-y=y*1e6#将偏置电压单位转化为 \mu V
+y=y*1e3#将偏置电压单位转化为 mV
 X,Y=np.meshgrid(x,y)
 
 # cmaps = ['viridis', 'plasma', 'inferno', 'magma',
@@ -116,11 +115,25 @@ X,Y=np.meshgrid(x,y)
 #     plt.subplot(8,10,i+1)
 #     pcolor(X,Y,R,cmap=cmaps[i])#颜色类型详见：https://matplotlib.org/examples/color/colormaps_reference.html
 
-pcolor(X,Y,G,cmap='jet')#颜色类型详见：https://matplotlib.org/examples/color/colormaps_reference.html
-colorbar()
+diagram_2D=pcolor(X,Y,G,cmap='jet')#颜色类型详见：https://matplotlib.org/examples/color/colormaps_reference.html
 
 xlabel(r'$B(T)$',fontsize=12)
-ylabel(r'$V_{Bias}(\mu V)$',fontsize=12,labelpad=12)
+ylabel(r'$V_{Bias}(mV)$',fontsize=12,labelpad=12)
+
+position=fig3.add_axes([0.3, 0.9, 0.6, 0.03])#位置[左,下,宽，高]
+cb=plt.colorbar(diagram_2D,orientation='horizontal',cax=position)
+
+
+min=round(G.min(),3)
+max=round(G.max(),3)
+mid=round((min+max)/2,3)
+cb.set_ticks([min,mid,max])
+cb.set_ticklabels([min,mid,max])
+
+cb.ax.text(-0.1,0.5,'$dI/dV(S)$',fontsize=12,horizontalalignment='center',verticalalignment='center')
+cb.ax.xaxis.set_ticks_position('top')
+
+
 # text(x.min()*1.08,y.max()-(y.max()-y.min())*0.15,'(a)')
 fig3.savefig('2-D.jpg')
 
