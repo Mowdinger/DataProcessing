@@ -58,8 +58,10 @@ def dr2dc(I_bias,dr):
     return V_new,dc_new
    
 #二维图：
-data2=ReadData('180323.004.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180323.004.txt')
+data2=ReadData('180322.005.txt',r'C:\Users\孙晓培\AnacondaProjects\DataProcessing\180322.005.txt')
 
+R_bias=1e6 #(unit: \Omega)
+I_Ac=1e-7  #(unit: A)
 #判断扫场的方式以及寻找断点
 for i in np.linspace(0,data2.shape[0]-1,data2.shape[0]):
     if data2[int(i)][-1]==data2[0][-1]:
@@ -70,12 +72,12 @@ for i in np.linspace(0,data2.shape[0]-1,data2.shape[0]):
         print('There are %d points in \'I_bias\' and %d points in Magnetic Filed \'B\'.' %(y_points,x_points))
         break
 
-for i in np.linspace(0,data2.shape[0]-1,data2.shape[0]):
-    if data2[int(i)][4]==0:
-        print('The point %d means zero magnet' %int(i))
-        break
+# for i in np.linspace(0,data2.shape[0]-1,data2.shape[0]):
+#     if data2[int(i)][2]==0:
+#         print('The point %d means zero magnet' %int(i))
+#         break
 
-fig3=plt.figure(3,figsize=(10,8),dpi=600)
+fig3=plt.figure(3,figsize=(30,8),dpi=600)
 
 # x=np.linspace(data2[0][-1],data2[-1][-1],x_points)
 # y=np.linspace(data2[0][3],data2[-1][3],y_points)
@@ -84,7 +86,7 @@ fig3=plt.figure(3,figsize=(10,8),dpi=600)
 # X,Y=np.meshgrid(x,y)
 
 x=np.linspace(data2[0][-1],data2[-1][-1],x_points)    #提取平行的磁场数据(unit:T)
-Ib=np.linspace(data2[0][2],data2[-1][2],y_points)/1e5 #提取直流电压数据并将其转化为偏置电流值(unit: A)
+Ib=np.linspace(data2[0][2],data2[-1][2],y_points)/R_bias #提取直流电压数据并将其转化为偏置电流值(unit: A)
 R=data2[:,1].reshape(x_points,y_points)
 R=R.T/1e-7 #提取锁相放大器测量的数据并将其转化为微分电阻值（unit: \Omega）
 
@@ -95,30 +97,20 @@ for i in np.linspace(0,x_points-1,x_points):
 y=y*1e3#将偏置电压单位转化为 mV
 X,Y=np.meshgrid(x,y)
 
-# cmaps = ['viridis', 'plasma', 'inferno', 'magma',
-#             'Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds',
-#             'YlOrBr', 'YlOrRd', 'OrRd', 'PuRd', 'RdPu', 'BuPu',
-#             'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn',
-#             'binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink',
-#             'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia',
-#             'hot', 'afmhot', 'gist_heat', 'copper',
-#             'PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
-#             'RdYlBu', 'RdYlGn', 'Spectral', 'coolwarm', 'bwr', 'seismic',
-#             'Pastel1', 'Pastel2', 'Paired', 'Accent',
-#             'Dark2', 'Set1', 'Set2', 'Set3',
-#             'tab10', 'tab20', 'tab20b', 'tab20c',
-#             'flag', 'prism', 'ocean', 'gist_earth', 'terrain', 'gist_stern',
-#             'gnuplot', 'gnuplot2', 'CMRmap', 'cubehelix', 'brg', 'hsv',
-#             'gist_rainbow', 'rainbow', 'jet', 'nipy_spectral', 'gist_ncar']
-# for i in np.linspace(0,78,79):
-#     i=int(i)
-#     plt.subplot(8,10,i+1)
-#     pcolor(X,Y,R,cmap=cmaps[i])#颜色类型详见：https://matplotlib.org/examples/color/colormaps_reference.html
-
 diagram_2D=pcolor(X,Y,G,cmap='jet')#颜色类型详见：https://matplotlib.org/examples/color/colormaps_reference.html
+#'viridis', 'plasma', 'inferno', 'magma','Greys', 'Purples', 'Blues', 'Greens', 'Oranges', 'Reds','YlOrBr', 'YlOrRd', 'OrRd', 'PuRd', 'RdPu', 'BuPu',
+#'GnBu', 'PuBu', 'YlGnBu', 'PuBuGn', 'BuGn', 'YlGn','binary', 'gist_yarg', 'gist_gray', 'gray', 'bone', 'pink',
+#'spring', 'summer', 'autumn', 'winter', 'cool', 'Wistia','hot', 'afmhot', 'gist_heat', 'copper','PiYG', 'PRGn', 'BrBG', 'PuOr', 'RdGy', 'RdBu',
+#'RdYlBu', 'RdYlGn', 'Spectral', 'coolwarm', 'bwr', 'seismic','Pastel1', 'Pastel2', 'Paired', 'Accent','Dark2', 'Set1', 'Set2', 'Set3','tab10', 'tab20', 'tab20b', 'tab20c',
+# 'flag', 'prism', 'ocean', 'gist_earth', 'terrain', 'gist_stern', 'gnuplot', 'gnuplot2', 'CMRmap', 'cubehelix', 'brg', 'hsv','gist_rainbow', 'rainbow', 'jet', 'nipy_spectral', 'gist_ncar']
 
-xlabel(r'$B(T)$',fontsize=12)
-ylabel(r'$V_{Bias}(mV)$',fontsize=12,labelpad=12)
+labelsize=30
+xlabel(r'$B(T)$',fontsize=labelsize)
+ylabel(r'$V_{Bias}(mV)$',fontsize=labelsize,labelpad=12)
+x_ticks = np.linspace(-0.45, 0.45, 5 )
+y_ticks = np.linspace(-1.5, 1.5, 3)
+plt.xticks(x_ticks,fontsize=labelsize)
+plt.yticks(y_ticks,fontsize=labelsize)
 
 position=fig3.add_axes([0.3, 0.9, 0.6, 0.03])#位置[左,下,宽，高]
 cb=plt.colorbar(diagram_2D,orientation='horizontal',cax=position)
@@ -130,11 +122,11 @@ mid=round((min+max)/2,3)
 cb.set_ticks([min,mid,max])
 cb.set_ticklabels([min,mid,max])
 
-cb.ax.text(-0.1,0.5,'$dI/dV(S)$',fontsize=12,horizontalalignment='center',verticalalignment='center')
+cb.ax.text(-0.05,0.5,'$dI/dV(S)$',fontsize=labelsize,horizontalalignment='center',verticalalignment='center')
 cb.ax.xaxis.set_ticks_position('top')
 
 
 # text(x.min()*1.08,y.max()-(y.max()-y.min())*0.15,'(a)')
-fig3.savefig('2-D.jpg')
-
-plt.show()
+fig3.savefig('2-D_1.jpg')
+#
+#plt.show()
